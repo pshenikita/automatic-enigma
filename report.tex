@@ -1,0 +1,265 @@
+\documentclass[a5paper, leqno, 10pt]{article}
+\usepackage{preamble}
+
+\begin{document}
+
+\newgeometry{
+    left=10mm,
+    right=10mm,
+    top=10mm,
+    bottom=10mm,
+    includefoot=false
+}
+
+\begin{titlepage}
+	\thispagestyle{empty}
+    \begin{center}
+        МГУ имени М.\,В.~Ломоносова
+
+		\bigskip
+
+        Механико-математический факультет
+
+        \vfill
+
+        {\Large \textbf{Отчёт по задаче №1 практикума на ЭВМ}\par \textbf{<<Конечные уравнения>>}}
+
+		\bigskip
+
+		Задача 1{.}10
+
+        \vfill
+
+        \begin{flushright}
+            \textit{Никита Пшеничный}\par группа~403
+        \end{flushright}
+
+        \vfill
+
+        Москва\\
+        2026
+    \end{center}
+\end{titlepage}
+
+\restoregeometry
+
+\section{Постановка задачи}
+
+Требуется найти все корни уравнения
+\[
+	\ln(\cos x) + e^{-x} = 0.
+\]
+
+\section{Предварительное исследование}
+
+Обозначим $f(x) \coloneqq \ln(\cos x) + e^{-x}$. Функция $f$ определена на множестве
+\[
+	\bigcup_{k \in \Z}I_k,\quad I_k \coloneqq \left(2\pi k - \frac{\pi}{2}; 2\pi k + \frac{\pi}{2}\right).
+\]
+Обозначим $a_k \coloneqq 2\pi k - \frac{\pi}{2}$, $b_k \coloneqq 2\pi k + \frac{\pi}{2}$. Так как
+\[
+	f(2\pi k) = e^{-2\pi k} > 0,\quad \lim_{x \to a_k +}f(x) = \lim_{x \to b_k -}f(x) = -\infty,
+\]
+то на каждом из интервалов $(a_k; 2\pi k)$ и $(2\pi k; b_k)$, $k \in \Z$, есть корень функции $f$. Докажем, что он единственный. В самом деле,
+\begin{gather*}
+	f^{\prime}(x) = -\tg x - e^{-x},\\
+	\big(e^xf^{\prime}(x)\big)^{\prime} = -e^x\left(\tg x + \frac{1}{\cos^2x}\right) = -e^x\left(\left(\tg x + \frac{1}{2}\right)^2 + \frac{3}{4}\right) < 0.
+\end{gather*}
+
+Следовательно, на каждом из интервалов $I_k$, $k \in \Z$, функция $e^xf^{\prime}(x)$ убывает, причём
+\[
+	\lim_{x \to a_k +}e^xf^{\prime}(x) = +\infty,\quad \lim_{x \to a_k -}e^xf^{\prime}(x) = -\infty.
+\]
+Значит, $f^{\prime}$ имеет на каждом интервале $I_k$ ровно один нуль.
+
+Таким образом, на каждом из интервалов $I_k$, $k \in \Z$, функция $f$ выпукла вниз, а значит, имеет не более двух корней на нём. Обозначим корни функции $f$, принадлежащие интервалам $(a_k; 2\pi k)$ и $(2\pi k; b_k)$, через $x_k^{-}$ и $x_k^{+}$ соответственно.
+
+\subsection{Корни уравнения $f(x) = 0$ на $I_k$ при $k \leqslant -1$}
+
+Так как $x_k^{-} - a_k, b_k - x_k^{+} \in \big(0; \frac{\pi}{2}\big)$ и $f(x_k^{-}) = f(x_k^{+}) = 0$, то
+\begin{gather*}
+	\frac{2(x_k^{-} - a_k)}{\pi} \leqslant \sin(x_k^{-} - a_k) = \cos x_k^{-} \leqslant \exp(-e^{-b_k}),\\
+	\frac{2(b_k - x_k^{+})}{\pi} \leqslant \sin(b_k - x_k^{+}) = \cos x_k^{+} \leqslant \exp(-e^{-b_k}).
+\end{gather*}
+Отсюда $0 < x_k^{-} - a_k,\,b_k - x_k^{+} \leqslant \frac{\pi}{2}\exp(-e^{-b_k})$. При $k \leqslant -1$
+\[
+	x_k^{-},\,x_k^{+} < b_k = 2\pi k + \frac{\pi}{2} \leqslant -\frac{3\pi}{2},
+\]
+следовательно, $\lvert x_k^{-}\rvert,\,\lvert x_k^{+}\rvert \geqslant \frac{3\pi}{2}$, а значит,
+\[
+	\frac{\lvert x_k^{-} - a_k\rvert}{\lvert x_k^{-}\rvert},\,
+	\frac{\lvert x_k^{+} - b_k\rvert}{\lvert x_k^{+}\rvert} \leqslant \frac{\frac{\pi}{2}\exp(-e^{3\pi / 2})}{\frac{3\pi}{2}} = \frac{1}{3}\exp(-e^{3\pi / 2}) \approx 1{.}51 \cdot 10^{-49}.
+\]
+
+Так как полученная относительная погрешность меньше машинной точности, то при численном решении можно считать, что при $k \leqslant -1$
+\[
+	x_k^{-} \approx a_k = 2\pi k - \frac{\pi}{2},\quad
+	x_k^{+} \approx b_k = 2\pi k + \frac{\pi}{2}.
+\]
+
+\subsection{Корни уравнения $f(x) = 0$ на $I_k$ при $k \to \infty$}
+
+Обозначим $L(t) \coloneqq -\ln\cos t$.
+
+\begin{lemma}
+	Если $0 < t < \frac{\pi}{2}$, то
+	\begin{equation} \label{eq:L_estimates}
+		\frac{t^2}{2} \leqslant L(t) \leqslant \frac{t^2}{2\cos^2t}.
+	\end{equation}
+\end{lemma}
+
+\begin{proof}
+	Заметим, что
+	\[
+		-\ln\cos t = \int_0^t\tg u\diff u.
+	\]
+	Но $\tg u \geqslant u$ при $0 < u < \frac{\pi}{2}$, следовательно,
+	\[
+		L(t) \geqslant \int_0^tu\diff u = \frac{t^2}{2}.
+	\]
+	С другой стороны,
+	\[
+		\tg u = \int_0^u\frac{1}{\cos^2v}\diff v.
+	\]
+	Если $0 < v \leqslant t < \frac{\pi}{2}$, то $\frac{1}{\cos^2v} < \frac{1}{\cos^2t}$, следовательно, при $0 < u < t$
+	\[
+		\tg u \leqslant \frac{1}{\cos^2t}\int_0^u\diff u = \frac{u}{\cos^2t}.
+	\]
+	Отсюда
+	\[
+		L(t) \leqslant \frac{1}{\cos^2 t}\int_0^tu\diff u = \frac{t^2}{2\cos^2t},
+	\]
+	что и требовалось.
+\end{proof}
+
+Обозначим $\alpha_k \coloneqq 2\pi k - x_k^{-}$ и $h_k \coloneq \sqrt{2}e^{-\pi k}$, $k \in \Z$, тогда
+\[
+	L(\alpha_k) = -\ln\cos x_k^{-} = e^{\alpha_k - 2\pi k} = \frac{h_k^2}{2}e^{\alpha_k}.
+\]
+Из $0 < \alpha_k < \frac{\pi}{2}$ и первого неравенства в \eqref{eq:L_estimates} вытекает, что
+\[
+	0 < \alpha_k \leqslant h_ke^{\alpha_k / 2} = \sqrt{2}e^{\alpha_k / 2 -\pi k} \leqslant \sqrt{2}e^{-3\pi / 4} \approx 0{.}134 < 1.
+\]
+Как известно, $e^{t / 2} \leqslant 1 + t$ при $0 \leqslant t \leqslant 1$. Отсюда и из $\alpha_k \leqslant h_ke^{\alpha_k / 2}$ получаем
+\begin{equation} \label{eq:upper_estimate}
+	\alpha_k \leqslant \frac{h_k}{1 - h_k}.
+\end{equation}
+Из второго неравенства в \eqref{eq:L_estimates} следует, что
+\[
+	\alpha_k \geqslant h_k\cos\alpha_ke^{\alpha_k / 2}.
+\]
+Так как при $0 \leqslant t \leqslant 1$
+\[
+	e^{t / 2} \geqslant 1,\quad \cos t \geqslant 1 - \frac{t^2}{2} \geqslant 1 - t,
+\]
+то для $0 < \alpha_k < 1$ получаем
+\begin{equation} \label{eq:lower_estimate}
+	\alpha_k \geqslant \frac{h_k}{1 + h_k}.
+\end{equation}
+Объединяя оценки \eqref{eq:upper_estimate} и \eqref{eq:lower_estimate}, получаем
+\[
+	\frac{h_k}{1 + h_k} \leqslant \alpha_k \leqslant \frac{h_k}{1 - h_k}.
+\]
+Отметим также, что при $k \geqslant 1$
+\[
+	h_k \leqslant \sqrt{2}e^{-\pi} \approx 0{.}061 < \frac{1}{3}.
+\]
+Следовательно,
+\[
+	\lvert\alpha_k - h_k\rvert \leqslant \frac{h_k}{1 - h_k} - h_k = \frac{h_k^2}{1 - h_k} < \frac{3h_k^2}{2} = 3e^{-2\pi k}.
+\]
+Аналогично для $\beta_k \coloneqq x_k^{+} - 2\pi k$ можно получить оценку
+\[
+	\lvert\beta_k - h_k\rvert \leqslant 3e^{-2\pi k}.
+\]
+Таким образом,
+\[
+	\lvert x_k^{-} - (2\pi k - h_k)\rvert,\,\lvert x_k^{+} - (2\pi k + h_k)\rvert \leqslant 3e^{-2\pi k}.
+\]
+Относительные погрешности равны
+\begin{equation} \label{eq:final_relative_estimate}
+	\frac{|x_k^{-} - (2\pi k - h_k)|}{|x_k^{-}|},\,\frac{|x_k^{+} - (2\pi k + h_k)|}{|x_k^{+}|} < \frac{3e^{-2\pi k}}{2\pi k - \frac{\pi}{2}} \to 0,\ k \to \infty.
+\end{equation}
+
+\subsection{Численное решение уравнения $f(x) = 0$}
+
+Пусть $\eps > 0$ --- заданная относительная погрешность решения. Как было показано выше, при $k \leqslant -1$
+\[
+	\frac{\big|x_k^{-} - \big(2\pi k - \frac{\pi}{2}\big)\big|}{|x_k^{-}|},\,
+	\frac{\big|x_k^{+} - \big(2\pi k + \frac{\pi}{2}\big)\big|}{|x_k^{+}|} < \eps
+\]
+для всех допустимых $\eps$ (минимальная допустимая). Поэтому для $k \leqslant -1$ в качестве корней уравнения $f(x) = 0$ на $I_k$ будут использоваться значения $2\pi k \pm \frac{\pi}{2}$. Отметим, что в этих точках функция $f$ не определена, поэтому проверять корни подстановкой некорректно.
+
+На каждом интервале $I_k$, $k \geqslant 0$, будем вычислять корни $x_k^{-}, x_k^{+} \in I_k$ уравнения $f(x) = 0$ методом деления отрезка пополам. При $k \geqslant 1$ выполнены оценки \eqref{eq:final_relative_estimate}, поэтому перед вычислением корней на интервале $I_k$ будем проверять, что
+\[
+	\frac{3e^{-2\pi k}}{2\pi k - \frac{\pi}{2}} \geqslant \eps.
+\]
+В противном случае в качестве корней будем использовать величины $2\pi k \pm h_k$. Отметим, что уже при $k = 5$ относительная погрешность корней не превышает
+\[
+	\frac{3e^{-10\pi}}{10\pi - \frac{\pi}{2}} \approx 2{.}28 \cdot 10^{-15} < 10^{-12}.
+\]
+
+\section{Результаты работы программы}
+
+Приведём результаты работы программы для нескольких значений относительной погрешности $\eps$. При $\eps = 10^{-2}$ программа вычисляет корни только при $k = 0$:
+
+\begin{center}
+	\begin{tabular}{c|cc}
+		$k$ & $x_k^-$                 & $x_k^+$                 \\[.5mm]
+		\hline
+		0   & $-1{.}5585244804918115$ & $0{.}85289331806441648$ 
+	\end{tabular}
+\end{center}
+
+\noindent
+Начиная с $k = 1$, используется асимптотическая формула
+\[
+	x_k^{\pm} \approx 2\pi k \pm \sqrt{2}e^{-\pi k},
+\]
+для которой относительная погрешность не превосходит $1{.}19 \cdot 10^{-3} < 10^{-2}$.
+
+При $\eps = 10^{-5}$ программа вычисляет корни при $k = 0, 1$:
+
+\begin{center}
+	\begin{tabular}{c|cc}
+		$k$ & $x_k^-$               & $x_k^+$               \\[.5mm]
+		\hline
+		0   & $-1.5623234797868095$ & $0.85754918944014769$ \\
+		1   & $ 6.2201482841774105$ & $6.3424832520112906$
+	\end{tabular}
+\end{center}
+
+Начиная с $k = 2$, используется асимптотическая формула; её относительная погрешность не превосходит $9{.}52 \cdot 10^{-7} < 10^{-5}$.
+
+При $\eps = 10^{-8}$ программа вычисляет корни при $k = 0, 1, 2$:
+
+\begin{center}
+	\begin{tabular}{c|cc}
+		$k$ & $x_k^-$               & $x_k^+$               \\[.5mm]
+		\hline
+		0   & $-1.5623145501348534$ & $0.85754930062192170$ \\
+		1   & $ 6.2201352232447986$ & $6.3424958448101165$  \\
+		2   & $12.563726126605642$  & $12.569008173732678$
+	\end{tabular}
+\end{center}
+
+Начиная с $k = 3$, используется асимптотическая формула; её относительная погрешность не превосходит $1{.}13 \cdot 10^{-9} < 10^{-8}$.
+
+При $\eps = 10^{-12}$ программа вычисляет корни при $k = 0, 1, 2, 3, 4$:
+
+\begin{center}
+	\begin{tabular}{c|cc}
+		$k$ & $x_k^-$               & $x_k^+$               \\[.5mm]
+		\hline
+		0   & $-1.5623145607652962$ & $0.85754930157839016$ \\
+		1   & $ 6.2201352007238606$ & $6.3424958806230372$  \\
+		2   & $12.563726158801270$  & $12.569008095226552$  \\
+		3   & $18.849441788681808$  & $18.849670041389452$  \\
+		4   & $25.132736296878630$  & $25.132746160558060$
+	\end{tabular}
+\end{center}
+
+Начиная с $k = 5$, используется асимптотическая формула; её относительная погрешность не превосходит $2{.}28 \cdot 10^{-15} < 10^{-12}$.
+
+\end{document}
+

@@ -1,0 +1,128 @@
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[russian]{babel}
+
+% Пакеты для шрифта postscript
+% \pdfmapfile{+pscyr.map}
+% \usepackage[math]{pscyr}
+
+\usepackage{amssymb,mathtools}
+\usepackage{bbm}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{wrapfig}
+\usepackage{tikz}
+% \usepackage{indentfirst}
+\usepackage[inline]{enumitem}
+\usepackage{titlesec}
+
+\usepackage[
+    left=10mm,
+    right=10mm,
+    top=10mm,
+    bottom=10mm,
+    includefoot
+]{geometry}
+
+\titleformat{\section}
+    {\normalfont\large\centering}
+    {\thesection.~}
+    {0pt}
+    {\bfseries}
+
+\titlespacing*{\section}
+    {0pt}
+    {1em}
+    {1em}
+
+\titleformat{\subsection}[runin]
+    {\normalfont}
+    {\thesubsection.~}
+    {0pt}
+    {\bfseries}
+    [.~\ignorespaces]
+
+\titlespacing*{\subsection}
+    {0pt}
+    {0.33em}
+    {0.33em}
+
+\numberwithin{equation}{section}
+
+\usepackage[
+    activate={true,nocompatibility},
+    expansion=false,
+    protrusion=true,
+    tracking=true,
+    final
+]{microtype}
+
+\usepackage[table,dvipsnames]{xcolor}
+
+\newcommand{\N}{\mathbb{N}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\Q}{\mathbb{Q}}
+\newcommand{\R}{\mathbb{R}}
+\AtBeginDocument{\renewcommand{\C}{\mathbb{C}}}
+\renewcommand{\S}{\mathbb{S}}
+\newcommand{\D}{\mathbb{D}}
+\newcommand{\eps}{\varepsilon}
+\newcommand{\diff}{\mathop{}\!\mathrm{d}}
+\renewcommand{\Re}{\operatorname{Re}}
+\renewcommand{\Im}{\operatorname{Im}}
+\newcommand{\Ker}{\operatorname{Ker}}
+\newcommand{\Int}{\operatorname{Int}}
+\newcommand{\sgn}{\operatorname{sgn}}
+\newcommand{\lk}{\operatorname{lk}}
+\newcommand{\st}{\operatorname{st}}
+\newcommand{\id}{\mathbbm{1}}
+\renewcommand{\vec}[1]{\boldsymbol{#1}}
+
+\newcommand*{\hm}[1]{%
+    #1\nobreak\discretionary{}{\hbox{$\mathsurround=0pt #1$}}{}%
+}
+
+\newcommand{\rnum}[1]{%
+    \uppercase\expandafter{\romannumeral #1\relax}%
+}
+
+\makeatletter
+\newcounter{theorem}[section]
+\renewcommand{\thetheorem}{\thesection.\arabic{theorem}}
+
+\newcommand{\CreateTheoremEnv}[2]{%
+    \NewDocumentEnvironment{#1}{ o }{%
+        \refstepcounter{theorem}%
+        \par\addvspace{\smallskipamount}\noindent%
+        {\scshape #2~\thetheorem\IfNoValueF{##1}{~(##1)}.}~\ignorespaces
+    }{\par\addvspace{\smallskipamount}}
+}
+\makeatother
+
+\CreateTheoremEnv{theorem}{Теорема}
+\CreateTheoremEnv{lemma}{Лемма}
+\CreateTheoremEnv{proposition}{Предложение}
+\CreateTheoremEnv{definition}{Определение}
+\CreateTheoremEnv{example}{Пример}
+\CreateTheoremEnv{corollary}{Следствие}
+\CreateTheoremEnv{exercise}{Упражнение}
+
+\newcommand\qedsymbol{\ensuremath{\blacksquare}}
+
+\newenvironment{proof}[1][Доказательство]{%
+    \par
+    \addvspace{\smallskipamount}%
+    \noindent
+    {\scshape #1.}\ %
+    \ignorespaces
+}{%
+    \hfill\qedsymbol
+    \par
+    \addvspace{\smallskipamount}%
+}
+
+\usepackage[pdfencoding=auto]{hyperref}
+
+\hypersetup{colorlinks=true, linkcolor=red, citecolor=red, urlcolor=blue}
+
+

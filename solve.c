@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     double tail_error;
 
     printf("Absolute eps: %.6g\n", EPS);
-    printf("  k                 left root                right root\n");
+    printf(" k        left root       right root\n");
 
     for (period = 0; ; ++period) {
         double center = 2. * pi * period;
@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
             return EXIT_FAILURE;
         }
 
-        printf("%3d  %24.17g  %24.17g\n",
+        printf("%2d %16.12g %16.12g\n",
                period, left_root, right_root);
     }
 

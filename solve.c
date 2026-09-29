@@ -1,23 +1,11 @@
-#include <errno.h>
-#include <float.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-static double get_eps() {
-	double eps = 1.;
+static const double EPS = 1e-12;
 
-	while (eps != 0)
-		eps /= 2.;
-
-	return eps;
-}
-
-/* Ищет левый (direction = -1) или правый (direction = 1)
-   корень около center = 2 * pi * k делением отрезка пополам */
-static double find_root(double center, int direction, double eps)
+static double find_root(double center, int direction)
 {
-    /* Ищем x = center + direction * t, 0 < t < pi / 2 */
     double left = 0.;
     double right = acos(-1.) / 2.;
 
@@ -25,25 +13,18 @@ static double find_root(double center, int direction, double eps)
         double midpoint = left + (right - left) / 2.;
         double root = center + direction * midpoint;
 
-        /* Нижняя оценка для |x| нужна для контроля относительной ошибки */
-        double min_absolute_root = fmin(fabs(center + direction * left), fabs(center + direction * right));
-
-        if ((right - left) / 2. <= eps * min_absolute_root)
+        if ((right - left) / 2. <= EPS / 2.)
             return root;
 
-        /* Упёрлись в точность double */
         if (midpoint == left || midpoint == right)
             return NAN;
 
-        /* ln(cos t) = ln(1 - 2 * sin^2(t / 2));
-           log1p точнее при малых t */
         double sine = sin(midpoint / 2.);
         double value = log1p(-2. * sine * sine) + exp(-root);
 
         if (!isfinite(value))
             return NAN;
 
-        /* В левом конце значение положительно, в правом отрицательно */
         if (value > 0.)
             left = midpoint;
         else
@@ -53,21 +34,8 @@ static double find_root(double center, int direction, double eps)
 
 int main(int argc, char *argv[])
 {
-	const double EPS = get_eps();
-
-    /* Единственный параметр программы - требуемая относительная точность */
-    if (argc != 2) {
-        fprintf(stderr, "Usage: %s relative_eps\n", argv[0]);
-        return EXIT_FAILURE;
-    }
-
-    char *end;
-    errno = 0;
-    double eps = strtod(argv[1], &end);
-
-    /* Проверяем, что аргумент является допустимым конечным числом */
-    if (errno != 0 || end == argv[1] || *end != '\0' || !isfinite(eps) || eps < 100. * EPS || eps >= 1.) {
-        fprintf(stderr, "relative_eps must be a number in [%.17g, 1).\n", 100. * EPS);
+    if (argc != 1) {
+        fprintf(stderr, "Usage: %s\n", argv[0]);
         return EXIT_FAILURE;
     }
 
@@ -75,25 +43,23 @@ int main(int argc, char *argv[])
     int period;
     double tail_error;
 
-    printf("Relative eps: %.6g\n", eps);
+    printf("Absolute eps: %.6g\n", EPS);
     printf("  k                 left root                right root\n");
 
     for (period = 0; ; ++period) {
         double center = 2. * pi * period;
 
-        /* Оценка относительной ошибки асимптотики
-           x = 2 * pi * k +/- sqrt(2) * exp(-pi * k) */
-        tail_error = 3. * exp(-center) / (center - pi / 2.);
+        tail_error = 3. * exp(-center);
 
-        /* Если асимптотическая формула уже достаточно точна, численно считать последующие корни не нужно */
-        if (period > 0 && tail_error <= eps)
+        if (period > 0 && tail_error <= EPS)
             break;
 
-        double left_root = find_root(center, -1, eps);
-        double right_root = find_root(center, 1, eps);
+        double left_root = find_root(center, -1);
+        double right_root = find_root(center, 1);
 
         if (!isfinite(left_root) || !isfinite(right_root)) {
-            fprintf(stderr, "Cannot reach the requested accuracy at k = %d.\n", period);
+            fprintf(stderr, "Cannot reach the requested accuracy at k = %d.\n",
+                    period);
             return EXIT_FAILURE;
         }
 
@@ -101,20 +67,19 @@ int main(int argc, char *argv[])
                period, left_root, right_root);
     }
 
-    /* Все оставшиеся корни при больших положительных k */
     printf("\nFor every integer k >= %d:\n", period);
     puts("  left root  ~= 2 * pi * k - sqrt(2) * exp(-pi * k)");
     puts("  right root ~= 2 * pi * k + sqrt(2) * exp(-pi * k)");
-    printf("  Relative approximation error < %.6e\n",
-           tail_error);
+    puts("  Absolute error bound: 3 * exp(-2 * pi * k)");
+    printf("  Maximum bound in this tail is approximately %.6e\n", tail_error);
 
-    /* Все оставшиеся корни при отрицательных k */
-    puts("\nFor every integer k <= -1:");
-    puts("  left root  ~= 2 * pi * k - pi/2");
-    puts("  right root ~= 2 * pi * k + pi/2");
-    printf("  Relative approximation error <= %.6e\n",
-           exp(-exp(3. * pi / 2.)) / 3.);
+    puts("\nFor every integer k <= -1:\n");
+    puts("  left root  ~= 2 * pi * k - pi / 2");
+    puts("  right root ~= 2 * pi * k + pi / 2");
+    puts("  Absolute error bound: (pi / 2) * exp(-exp(3 * pi / 2))");
+    printf("  This bound is approximately %.6e\n", (pi / 2.) * exp(-exp(3. * pi / 2.)));
     puts("  These endpoints are approximations, not exact roots!");
+    puts("  Tail error bounds refer to exact mathematical formulas.");
 
     return EXIT_SUCCESS;
 }

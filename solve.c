@@ -73,13 +73,12 @@ int main(int argc, char *argv[])
     puts("  Absolute error bound: 3 * exp(-2 * pi * k)");
     printf("  Maximum bound in this tail is approximately %.6e\n", tail_error);
 
-    puts("\nFor every integer k <= -1:\n");
+    puts("\nFor every integer k <= -1:");
     puts("  left root  ~= 2 * pi * k - pi / 2");
     puts("  right root ~= 2 * pi * k + pi / 2");
     puts("  Absolute error bound: (pi / 2) * exp(-exp(3 * pi / 2))");
     printf("  This bound is approximately %.6e\n", (pi / 2.) * exp(-exp(3. * pi / 2.)));
     puts("  These endpoints are approximations, not exact roots!");
-    puts("  Tail error bounds refer to exact mathematical formulas.");
 
     return EXIT_SUCCESS;
 }

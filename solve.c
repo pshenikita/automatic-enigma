@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
     errno = 0;
     double eps = strtod(argv[1], &end);
 
-    /* Проверяем, что аргумент целиком является допустимым конечным числом */
+    /* Проверяем, что аргумент является допустимым конечным числом */
     if (errno != 0 || end == argv[1] || *end != '\0' || !isfinite(eps) || eps < 100. * EPS || eps >= 1.) {
         fprintf(stderr, "relative_eps must be a number in [%.17g, 1).\n", 100. * EPS);
         return EXIT_FAILURE;
@@ -85,19 +85,15 @@ int main(int argc, char *argv[])
            x = 2 * pi * k +/- sqrt(2) * exp(-pi * k) */
         tail_error = 3. * exp(-center) / (center - pi / 2.);
 
-        /* Если асимптотика уже достаточно точна, численно считать последующие корни не нужно */
+        /* Если асимптотическая формула уже достаточно точна, численно считать последующие корни не нужно */
         if (period > 0 && tail_error <= eps)
             break;
 
-        double left_root =
-            find_root(center, -1, eps);
-        double right_root =
-            find_root(center, 1, eps);
+        double left_root = find_root(center, -1, eps);
+        double right_root = find_root(center, 1, eps);
 
         if (!isfinite(left_root) || !isfinite(right_root)) {
-            fprintf(stderr,
-                    "Cannot reach the requested accuracy at k = %d.\n",
-                    period);
+            fprintf(stderr, "Cannot reach the requested accuracy at k = %d.\n", period);
             return EXIT_FAILURE;
         }
 
@@ -112,14 +108,13 @@ int main(int argc, char *argv[])
     printf("  Relative approximation error < %.6e\n",
            tail_error);
 
-    /* При k < 0 корни с огромной точностью близки
-       к границам интервала определения */
+    /* Все оставшиеся корни при отрицательных k */
     puts("\nFor every integer k <= -1:");
     puts("  left root  ~= 2 * pi * k - pi/2");
     puts("  right root ~= 2 * pi * k + pi/2");
     printf("  Relative approximation error <= %.6e\n",
            exp(-exp(3. * pi / 2.)) / 3.);
-    puts("  These endpoints are approximations, not exact roots.");
+    puts("  These endpoints are approximations, not exact roots!");
 
     return EXIT_SUCCESS;
 }
